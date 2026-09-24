@@ -6,10 +6,18 @@ const messageRoutes=require('./routes/message.routes');
 const cookieParser=require('cookie-parser')
 const app=express();
 const cors=require('cors');
+const allowedOrigins = Array.from(new Set([
+  process.env.FRONTEND_URL,
+  "https://student-gigs-i6si.vercel.app",
+  "https://student-gigs-eight.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean)));
+
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );

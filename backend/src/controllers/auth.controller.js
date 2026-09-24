@@ -4,6 +4,19 @@ const deleteFile=require('../services/deleteFile')
 const JWT=require('jsonwebtoken');
 const bcrypt=require('bcryptjs');
 
+function getCookieOptions(req) {
+    const isProduction = process.env.NODE_ENV === "production" ||
+                         (process.env.FRONTEND_URL && process.env.FRONTEND_URL.startsWith("https")) ||
+                         req?.secure ||
+                         req?.headers?.['x-forwarded-proto'] === 'https';
+
+    return {
+        httpOnly: true,
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
+    };
+}
+
 async function signup(req,res){
     
     const {name, email, password}=req.body;
@@ -29,10 +42,7 @@ async function signup(req,res){
         email:email,
     },process.env.JWT_SECRET);
 
-    res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-});
+    res.cookie("token", token, getCookieOptions(req));
 
     res.status(201).json({
         message:'user created sucessfully',
@@ -70,10 +80,7 @@ async function login(req,res){
         email:email
     },process.env.JWT_SECRET);
 
-    res.cookie("token", token, {
-    httpOnly: true,
-    sameSite: "lax",
-});
+    res.cookie("token", token, getCookieOptions(req));
 
     res.status(200).json({
         message:'user login successfully',
@@ -108,10 +115,7 @@ async function getMe(req, res) {
 
 
 async function logoutUser(req,res){
-    res.clearCookie("token", {
-    httpOnly: true,
-    sameSite: "lax",
-});
+    res.clearCookie("token", getCookieOptions(req));
 
     res.status(200).json({
         message:'User logout successfully'

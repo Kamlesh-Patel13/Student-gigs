@@ -13,9 +13,17 @@ connectedDB();
 
 const server = http.createServer(app);
 
+const allowedOrigins = Array.from(new Set([
+    process.env.FRONTEND_URL,
+    "https://student-gigs-i6si.vercel.app",
+    "https://student-gigs-eight.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+].filter(Boolean)));
+
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: allowedOrigins,
         credentials: true,
     },
 });
