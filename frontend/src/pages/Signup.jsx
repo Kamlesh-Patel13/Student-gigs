@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../services/Api";
 import { FaGraduationCap, FaUser, FaEnvelope, FaLock, FaArrowLeft, FaLaptopCode } from "react-icons/fa";
 
 export default function Signup() {
@@ -23,11 +23,7 @@ export default function Signup() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/signup",
-        form,
-        { withCredentials: true }
-      );
+      const response = await API.post("/auth/signup", form);
 
       console.log("Signup Successful:", response.data);
       alert(response.data.message || "Signup Successful");

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../services/Api";
 import { FaGraduationCap, FaEnvelope, FaLock, FaArrowLeft, FaLaptopCode } from "react-icons/fa";
 
 export default function Login() {
@@ -21,11 +21,7 @@ export default function Login() {
       return;
     }
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
-        form,
-        { withCredentials: true }
-      );
+      const response = await API.post("/auth/login", form);
 
       console.log("Login Successful:", response.data);
       navigate("/");

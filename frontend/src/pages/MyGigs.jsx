@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../services/Api";
 import { FaPlus, FaArrowLeft, FaEdit, FaTrash, FaBriefcase, FaTag, FaUser, FaUserCheck, FaTimes } from "react-icons/fa";
 
 export default function MyGigs() {
@@ -33,18 +34,10 @@ export default function MyGigs() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/gig/my", {
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch my gigs");
-      }
-
-      const data = await res.json();
-      setGigs(data.gigs || []);
+      const res = await API.get("/gig/my");
+      setGigs(res.data.gigs || []);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -83,46 +76,18 @@ export default function MyGigs() {
 
     try {
       if (editingId) {
-        const res = await fetch(`http://localhost:3000/api/gig/gig/${editingId}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(form),
-        });
-
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.message || "Failed to update gig");
-        }
-
-        const data = await res.json();
+        const res = await API.patch(`/gig/gig/${editingId}`, form);
         setGigs((prev) =>
-          prev.map((g) => (g._id === editingId ? data.gig : g))
+          prev.map((g) => (g._id === editingId ? res.data.gig : g))
         );
       } else {
-        const res = await fetch("http://localhost:3000/api/gig/create", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(form),
-        });
-
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.message || "Failed to create gig");
-        }
-
-        await res.json();
+        await API.post("/gig/create", form);
         await fetchGigs();
       }
 
       resetForm();
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -150,19 +115,10 @@ export default function MyGigs() {
     setError("");
 
     try {
-      const res = await fetch(`http://localhost:3000/api/gig/delete/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Failed to delete gig");
-      }
-
+      await API.delete(`/gig/delete/${id}`);
       setGigs((prev) => prev.filter((g) => g._id !== id));
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }

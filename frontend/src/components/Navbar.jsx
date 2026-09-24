@@ -12,7 +12,6 @@ import {
   FaChevronDown 
 } from "react-icons/fa";
 import { useEffect, useRef, useState, useCallback } from "react";
-import axios from "axios";
 import API from "../services/Api";
 import { useSocket } from "../context/SocketContext";
 import NotificationInbox from "./NotificationInbox";
@@ -57,10 +56,7 @@ export default function Navbar() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/auth/me",
-          { withCredentials: true }
-        );
+        const response = await API.get("/auth/me");
 
         setIsLoggedIn(true);
         setProfilePicture(response.data.user.profilePicture || "");
@@ -142,10 +138,9 @@ export default function Navbar() {
       const formData = new FormData();
       formData.append("profilePicture", file);
 
-      const response = await axios.post(
-        "http://localhost:3000/api/auth/upload/profile",
-        formData,
-        { withCredentials: true }
+      const response = await API.post(
+        "/auth/upload/profile",
+        formData
       );
 
       setProfilePicture(response.data.profilePicture);
@@ -164,10 +159,7 @@ export default function Navbar() {
   const handleRemoveProfile = async () => {
     try {
       setRemoving(true);
-      const response = await axios.delete(
-        "http://localhost:3000/api/auth/delete/profile",
-        { withCredentials: true }
-      );
+      const response = await API.delete("/auth/delete/profile");
 
       setProfilePicture("");
       setShowProfileMenu(false);
@@ -183,10 +175,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      await axios.delete(
-        "http://localhost:3000/api/auth/logout",
-        { withCredentials: true }
-      );
+      await API.delete("/auth/logout");
 
       setIsLoggedIn(false);
       setProfilePicture("");

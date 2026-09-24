@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import API from "../services/Api";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import GigCard from "../components/GigCard";
@@ -19,16 +20,8 @@ export default function Home() {
         setLoading(true);
         setError("");
 
-        const res = await fetch("http://localhost:3000/api/gig/", {
-          credentials: "include",
-        });
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch gigs");
-        }
-
-        const data = await res.json();
-        setGigs(data.gigs || []);
+        const res = await API.get("/gig/");
+        setGigs(res.data.gigs || []);
       } catch (err) {
         console.log(err);
         setError("Unable to load gigs");
